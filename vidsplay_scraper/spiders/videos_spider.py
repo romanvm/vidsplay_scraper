@@ -4,9 +4,6 @@
 
 from typing import Iterator
 import scrapy
-from scrapy.loader import ItemLoader
-from scrapy.loader.processors import TakeFirst
-from vidsplay_scraper.items import VideoItem
 
 HOME_URL = 'https://www.vidsplay.com'
 
@@ -37,20 +34,19 @@ class VideosSpider(scrapy.Spider):
                                  callback=self.parse_video,
                                  meta={'category': category})
 
-    def parse_video(self, response: scrapy.http.Response) -> scrapy.Item:
-        loader = ItemLoader(item=VideoItem(), response=response)
-        loader.default_output_processor = TakeFirst()
-        loader.add_value('category', response.meta['category'])
-        loader.add_xpath(
-            'title',
+    def parse_video(self, response: scrapy.http.Response) -> dict:
+        title = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/header/h1/text()'
-        )
-        loader.add_xpath(
-            'thumbnail',
+        ).extract_first()
+        thumbnail = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/div/div[2]/div[1]/meta[@itemprop="thumbnailUrl"]/@content'
-        )
-        loader.add_xpath(
-            'url',
+        ).extract_first()
+        url = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/div/div[2]/div[1]/meta[@itemprop="contentURL"]/@content'
-        )
-        return loader.load_item()
+        ).extract_first()
+        return {
+            'category': response.meta['category'],
+            'title': title,
+            'thumbnail': thumbnail,
+            'url': url
+        }

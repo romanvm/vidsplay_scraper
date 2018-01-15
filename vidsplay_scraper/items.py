@@ -5,11 +5,11 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/items.html
 
-import scrapy
-
-
-class VideoItem(scrapy.Item):
-    category = scrapy.Field()
-    title = scrapy.Field()
-    thumbnail = scrapy.Field()
-    url = scrapy.Field()
+# import scrapy
+#
+#
+# class VideoItem(scrapy.Item):
+#     category = scrapy.Field()
+#     title = scrapy.Field()
+#     thumbnail = scrapy.Field()
+#     url = scrapy.Field()
