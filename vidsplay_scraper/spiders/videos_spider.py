@@ -22,27 +22,34 @@ class VideosSpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse_category)
 
     def parse_category(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
-        category = response.xpath(
-            '/html/body/div[1]/div/div/div/div/main/article/header/h1/text()'
-        ).extract_first()
-        video_selectors = response.xpath(
-            '/html/body/div[1]/div/div/div/div/main/article/div/div[1]/div/div/div/div[@class="pt-cv-ifield"]'
+        base_selector = response.xpath(
+            '/html/body/div[1]/div/div/div/div/main/article'
         )
-        for selector in video_selectors[:3]: # We want to be nice and scrap only 3 items
+        category = base_selector.xpath(
+            './header/h1/text()'
+        ).extract_first()
+        video_selectors = base_selector.xpath(
+            './div/div[1]/div/div/div/div[@class="pt-cv-ifield"]'
+        )
+        for selector in video_selectors[:3]:  # We want to be nice and scrap only 3 items
             url = selector.xpath('./p/a/@href').extract_first()
+            # ``meta`` argument can be used to pass data to downstream spider callbacks
             yield scrapy.Request(url,
                                  callback=self.parse_video,
                                  meta={'category': category})
 
     def parse_video(self, response: scrapy.http.Response) -> Iterator[dict]:
-        title = response.xpath(
-            '/html/body/div[1]/div/div/div/div/main/article/div/header/h1/text()'
+        base_selector = response.xpath(
+            '/html/body/div[1]/div/div/div/div/main/article/div'
+        )
+        title = base_selector.xpath(
+            './header/h1/text()'
         ).extract_first()
-        thumbnail = response.xpath(
-            '/html/body/div[1]/div/div/div/div/main/article/div/div/div[2]/div[1]/meta[@itemprop="thumbnailUrl"]/@content'
+        thumbnail = base_selector.xpath(
+            './div/div[2]/div[1]/meta[@itemprop="thumbnailUrl"]/@content'
         ).extract_first()
-        url = response.xpath(
-            '/html/body/div[1]/div/div/div/div/main/article/div/div/div[2]/div[1]/meta[@itemprop="contentURL"]/@content'
+        url = base_selector.xpath(
+            './div/div[2]/div[1]/meta[@itemprop="contentURL"]/@content'
         ).extract_first()
         yield {
             'category': response.meta['category'],
