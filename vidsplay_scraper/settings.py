@@ -13,7 +13,10 @@ import os
 import time
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXPORT_DIR = os.path.join(BASE_DIR, 'out')
+OUT_DIR = os.path.join(BASE_DIR, 'out')
+OUT_FILE = os.path.join(
+    OUT_DIR, 'vidsplay-{}'.format(time.strftime('%Y%m%d%H%M%S'))
+)
 
 BOT_NAME = 'vidsplay_scraper'
 
@@ -22,7 +25,8 @@ NEWSPIDER_MODULE = 'vidsplay_scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
+USER_AGENT = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+              '(KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36')
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -71,7 +75,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'vidsplay_scraper.pipelines.VideosPipeline': 300,
+    'vidsplay_scraper.pipelines.XlsxPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -97,9 +101,7 @@ AUTOTHROTTLE_ENABLED = True
 
 # Settings for saving results to a .json file
 
-FEED_URI = 'file:///{}'.format(os.path.join(
-   EXPORT_DIR, 'vidsplay-{}.json'.format(time.strftime('%Y%m%d%H%M%S')))
-)
+FEED_URI = 'file:///{}.json'.format(out_file)
 FEED_FORMAT = 'json'
 FEED_EXPORT_ENCODING = 'utf-8'
 FEED_EXPORT_INDENT = 2
