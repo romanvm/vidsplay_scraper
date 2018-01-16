@@ -9,12 +9,15 @@ HOME_URL = 'https://www.vidsplay.com'
 
 
 class VideosSpider(scrapy.Spider):
+    """Parse videos from vidsplay.com"""
     name = 'videos'
 
     def start_requests(self) -> Iterator[scrapy.Request]:
+        """Entry point for our spider"""
         yield scrapy.Request(HOME_URL, callback=self.parse)
 
     def parse(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
+        """Parse vidsplay.com index page"""
         category_urls = response.xpath(
             '/html/body/div[1]/div/div/div/aside/section[3]/div/ul/li/a/@href'
         ).extract()
@@ -22,6 +25,7 @@ class VideosSpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse_category)
 
     def parse_category(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
+        """Parse a video category page"""
         base_selector = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article'
         )
@@ -39,6 +43,7 @@ class VideosSpider(scrapy.Spider):
                                  meta={'category': category})
 
     def parse_video(self, response: scrapy.http.Response) -> Iterator[dict]:
+        """Parse a video details page"""
         base_selector = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div'
         )
