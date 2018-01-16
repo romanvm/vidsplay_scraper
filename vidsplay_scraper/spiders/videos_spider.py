@@ -11,14 +11,14 @@ HOME_URL = 'https://www.vidsplay.com'
 class VideosSpider(scrapy.Spider):
     name = 'videos'
 
-    def start_requests(self):
+    def start_requests(self) -> Iterator[scrapy.Request]:
         yield scrapy.Request(HOME_URL, callback=self.parse)
 
     def parse(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
         category_urls = response.xpath(
             '/html/body/div[1]/div/div/div/aside/section[3]/div/ul/li/a/@href'
         ).extract()
-        for url in category_urls:
+        for url in category_urls[:3]:  # We want to be nice and scrap only 3 items
             yield scrapy.Request(url, callback=self.parse_category)
 
     def parse_category(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
@@ -28,13 +28,13 @@ class VideosSpider(scrapy.Spider):
         video_selectors = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/div[1]/div/div/div/div[@class="pt-cv-ifield"]'
         )
-        for selector in video_selectors:
-            url = selector.xpath('//p/a/@href').extract_first()
+        for selector in video_selectors[:3]: # We want to be nice and scrap only 3 items
+            url = selector.xpath('./p/a/@href').extract_first()
             yield scrapy.Request(url,
                                  callback=self.parse_video,
                                  meta={'category': category})
 
-    def parse_video(self, response: scrapy.http.Response) -> dict:
+    def parse_video(self, response: scrapy.http.Response) -> Iterator[dict]:
         title = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/header/h1/text()'
         ).extract_first()
@@ -44,7 +44,7 @@ class VideosSpider(scrapy.Spider):
         url = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div/div/div[2]/div[1]/meta[@itemprop="contentURL"]/@content'
         ).extract_first()
-        return {
+        yield {
             'category': response.meta['category'],
             'title': title,
             'thumbnail': thumbnail,

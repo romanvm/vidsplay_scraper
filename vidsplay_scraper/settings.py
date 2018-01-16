@@ -9,6 +9,12 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
+import os
+import time
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXPORT_DIR = os.path.join(BASE_DIR, 'out')
+
 BOT_NAME = 'vidsplay_scraper'
 
 SPIDER_MODULES = ['vidsplay_scraper.spiders']
@@ -16,7 +22,7 @@ NEWSPIDER_MODULE = 'vidsplay_scraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'vidsplay_scraper (+http://www.yourdomain.com)'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -88,3 +94,12 @@ AUTOTHROTTLE_ENABLED = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Settings for saving results to a .json file
+
+FEED_URI = 'file:///{}'.format(os.path.join(
+   EXPORT_DIR, 'vidsplay-{}.json'.format(time.strftime('%Y%m%d%H%M%S')))
+)
+FEED_FORMAT = 'json'
+FEED_EXPORT_ENCODING = 'utf-8'
+FEED_EXPORT_INDENT = 2
