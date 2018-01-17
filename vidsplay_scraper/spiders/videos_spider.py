@@ -5,16 +5,15 @@
 from typing import Iterator
 import scrapy
 
-HOME_URL = 'https://www.vidsplay.com'
-
 
 class VideosSpider(scrapy.Spider):
     """Parse videos from vidsplay.com"""
     name = 'videos'
+    start_url = 'https://www.vidsplay.com'
 
     def start_requests(self) -> Iterator[scrapy.Request]:
         """Entry point for our spider"""
-        yield scrapy.Request(HOME_URL, callback=self.parse)
+        yield scrapy.Request(self.start_url, callback=self.parse)
 
     def parse(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
         """Parse vidsplay.com index page"""
