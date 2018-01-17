@@ -21,7 +21,7 @@ class VideosSpider(scrapy.Spider):
             '/html/body/div[1]/div/div/div/aside/section[3]/div/ul/li/a/@href'
         ).extract()
         for url in category_urls[:3]:  # We want to be nice and scrap only 3 items
-            yield scrapy.Request(url, callback=self.parse_category)
+            yield response.follow(url, callback=self.parse_category)
 
     def parse_category(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
         """Parse a video category page"""
@@ -37,9 +37,9 @@ class VideosSpider(scrapy.Spider):
         for selector in video_selectors[:3]:  # We want to be nice and scrap only 3 items
             url = selector.xpath('./p/a/@href').extract_first()
             # ``meta`` argument can be used to pass data to downstream spider callbacks
-            yield scrapy.Request(url,
-                                 callback=self.parse_video,
-                                 meta={'category': category})
+            yield response.follow(url,
+                                  callback=self.parse_video,
+                                  meta={'category': category})
 
     def parse_video(self, response: scrapy.http.Response) -> Iterator[dict]:
         """Parse a video details page"""
