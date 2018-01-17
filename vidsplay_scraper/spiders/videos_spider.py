@@ -2,7 +2,6 @@
 # Created on: 15.01.2018
 # Author: Roman Miroshnychenko aka Roman V.M. (roman1972@gmail.com)
 
-from typing import Iterator
 import scrapy
 
 
@@ -11,11 +10,11 @@ class VideosSpider(scrapy.Spider):
     name = 'videos'
     start_url = 'https://www.vidsplay.com'
 
-    def start_requests(self) -> Iterator[scrapy.Request]:
+    def start_requests(self):
         """Entry point for our spider"""
         yield scrapy.Request(self.start_url, callback=self.parse)
 
-    def parse(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
+    def parse(self, response):
         """Parse vidsplay.com index page"""
         category_urls = response.xpath(
             '/html/body/div[1]/div/div/div/aside/section[3]/div/ul/li/a/@href'
@@ -23,7 +22,7 @@ class VideosSpider(scrapy.Spider):
         for url in category_urls[:3]:  # We want to be nice and scrap only 3 items
             yield response.follow(url, callback=self.parse_category)
 
-    def parse_category(self, response: scrapy.http.Response) -> Iterator[scrapy.Request]:
+    def parse_category(self, response):
         """Parse a video category page"""
         base_selector = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article'
@@ -41,7 +40,7 @@ class VideosSpider(scrapy.Spider):
                                   callback=self.parse_video,
                                   meta={'category': category})
 
-    def parse_video(self, response: scrapy.http.Response) -> Iterator[dict]:
+    def parse_video(self, response):
         """Parse a video details page"""
         base_selector = response.xpath(
             '/html/body/div[1]/div/div/div/div/main/article/div'
