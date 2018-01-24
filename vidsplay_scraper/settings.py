@@ -101,7 +101,7 @@ AUTOTHROTTLE_ENABLED = True
 
 # Settings for saving results to a .json file
 
-FEED_URI = 'file:///{}.json'.format(out_file)
+FEED_URI = 'file:///{}.json'.format(OUT_FILE)
 FEED_FORMAT = 'json'
 FEED_EXPORT_ENCODING = 'utf-8'
 FEED_EXPORT_INDENT = 2
